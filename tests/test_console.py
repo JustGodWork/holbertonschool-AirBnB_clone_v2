@@ -10,9 +10,9 @@ from unittest.mock import patch
 from io import StringIO
 
 
-class TestHBNBCommand(unittest.TestCase):
+class TestHBTNCommand(unittest.TestCase):
     """
-    Test cases for the console
+    Test cases for console
     """
     def setUp(self):
         self.cli = HBNBCommand()
@@ -57,6 +57,15 @@ class TestHBNBCommand(unittest.TestCase):
         """
         with patch('sys.stdout', new=StringIO()) as f:
             self.cli.onecmd("create BaseModel name")
+            self.assertNotEqual(f.getvalue(), "** class doesn't exist **\n")
+            self.assertNotEqual(f.getvalue(), "** class name missing **\n")
+
+    def test_do_create_valid_class_with_different_types_of_params(self):
+        """
+        Test create command with valid class and different types of params
+        """
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.cli.onecmd("create BaseModel name=\"John\" age=30 weight=75.5")
             self.assertNotEqual(f.getvalue(), "** class doesn't exist **\n")
             self.assertNotEqual(f.getvalue(), "** class name missing **\n")
 
