@@ -134,7 +134,7 @@ class HBNBCommand(cmd.Cmd):
                 value = key_value[1]
                 if value.startswith('"') and value.endswith('"'):
                     #print(f"key: {key} value: str({value})")
-                    value = value[1:-1]
+                    value = value[1:-1].replace('_', ' ')
                 elif '.' in value:
                     try:
                         #print(f"key: {key} value: float({value})")
