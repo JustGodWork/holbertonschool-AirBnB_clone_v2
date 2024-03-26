@@ -12,7 +12,7 @@ from io import StringIO
 
 class TestHBTNCommand(unittest.TestCase):
     """
-    Test cases for console
+    Test cases for the console
     """
     def setUp(self):
         self.cli = HBNBCommand()
@@ -48,6 +48,24 @@ class TestHBTNCommand(unittest.TestCase):
         """
         with patch('sys.stdout', new=StringIO()) as f:
             self.cli.onecmd("create BaseModel name=\"John\"")
+            self.assertNotEqual(f.getvalue(), "** class doesn't exist **\n")
+            self.assertNotEqual(f.getvalue(), "** class name missing **\n")
+
+    def test_do_create_valid_class_with_param_int(self):
+        """
+        Test create command with valid class and integer param
+        """
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.cli.onecmd("create BaseModel number=89")
+            self.assertNotEqual(f.getvalue(), "** class doesn't exist **\n")
+            self.assertNotEqual(f.getvalue(), "** class name missing **\n")
+
+    def test_do_create_valid_class_with_param_float(self):
+        """
+        Test create command with valid class and float param
+        """
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.cli.onecmd("create BaseModel number=89.9")
             self.assertNotEqual(f.getvalue(), "** class doesn't exist **\n")
             self.assertNotEqual(f.getvalue(), "** class name missing **\n")
 
