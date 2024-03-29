@@ -133,17 +133,17 @@ class HBNBCommand(cmd.Cmd):
                 key = key_value[0]
                 value = key_value[1]
                 if value.startswith('"') and value.endswith('"'):
-                    #print(f"key: {key} value: str({value})")
+                    # print(f"key: {key} value: str({value})")
                     value = value[1:-1].replace('_', ' ')
                 elif '.' in value:
                     try:
-                        #print(f"key: {key} value: float({value})")
+                        # print(f"key: {key} value: float({value})")
                         value = float(value)
                     except ValueError:
                         continue
                 else:
                     try:
-                        #print(f"key: {key} value: int({value})")
+                        # print(f"key: {key} value: int({value})")
                         value = int(value)
                     except ValueError:
                         continue
