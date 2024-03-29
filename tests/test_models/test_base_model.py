@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """ """
+from unittest.mock import patch
 from models.base_model import BaseModel
 import unittest
 import datetime
@@ -55,6 +56,14 @@ class test_basemodel(unittest.TestCase):
         with open('file.json', 'r') as f:
             j = json.load(f)
             self.assertEqual(j[key], i.to_dict())
+
+    def test_save2(self):
+        """ """
+        with patch('models.storage') as mock:
+            mock.type = 'db'
+            self.value().save()
+            mock.new.assert_called()
+            mock.save.assert_called()
 
     def test_str(self):
         """ """

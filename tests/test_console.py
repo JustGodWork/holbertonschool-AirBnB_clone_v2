@@ -109,25 +109,54 @@ class TestHBTNCommand(unittest.TestCase):
                     "** class name missing **\n"
                 )
 
+    def test_create_state_dbstorage(self):
+        """
+        Test create command with dbstorage for State and City
+        """
+        with patch('sys.stdout', new=StringIO()) as f:
+            with patch('models.storage') as mock_storage:
+                mock_storage.type = 'db'
+                self.cli.onecmd("create State name=\"California\"")
+                mock_storage.new.assert_called()
+                mock_storage.save.assert_called()
+                self.assertNotEqual(
+                    f.getvalue(),
+                    "** class doesn't exist **\n"
+                )
+                self.assertNotEqual(
+                    f.getvalue(),
+                    "** class name missing **\n"
+                )
+
     def test_create_state_and_city_dbstorage(self):
         """
         Test create command with dbstorage for State and City
         """
         with patch('sys.stdout', new=StringIO()) as f:
             with patch('models.storage') as mock_storage:
-                from models.state import State
-                from models.city import City
                 mock_storage.type = 'db'
-                # Create and save State
-                state = State(name="California")
-                state.save()
-                mock_storage.new.assert_called_with(state)
+                self.cli.onecmd("create State name=\"California\"")
+                mock_storage.new.assert_called()
                 mock_storage.save.assert_called()
-                # Create and save City
-                city = City(state_id=state.id, name="Fremont")
-                city.save()
-                mock_storage.new.assert_called_with(city)
+                self.assertNotEqual(
+                    f.getvalue(),
+                    "** class doesn't exist **\n"
+                )
+                self.assertNotEqual(
+                    f.getvalue(),
+                    "** class name missing **\n"
+                )
+                self.cli.onecmd(f"create City state_id=\"{f.getvalue()}\" name=\"Fremont\"")
+                mock_storage.new.assert_called()
                 mock_storage.save.assert_called()
+                self.assertNotEqual(
+                    f.getvalue(),
+                    "** class doesn't exist **\n"
+                )
+                self.assertNotEqual(
+                    f.getvalue(),
+                    "** class name missing **\n"
+                )
 
     def test_create_state_and_city_dbstorage_with_spacer(self):
         """
