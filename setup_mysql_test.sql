@@ -10,5 +10,21 @@ GRANT ALL PRIVILEGES ON hbnb_test_db.* TO 'hbnb_test'@'localhost';
 -- Grant SELECT privilege on performance_schema to hbnb_test
 GRANT SELECT ON performance_schema.* TO 'hbnb_test'@'localhost';
 
---- Flush privileges (to apply the changes)
+USE hbnb_dev_db;
+
+CREATE TABLE states (
+    id INT AUTO_INCREMENT,
+    name VARCHAR(255),
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE cities (
+    id INT AUTO_INCREMENT,
+    name VARCHAR(128) NOT NULL,
+    state_id VARCHAR(60) NOT NULL,
+    PRIMARY KEY(id),
+    FOREIGN KEY(state_id) REFERENCES states(id)
+);
+
+-- Flush privileges (to apply the changes)
 FLUSH PRIVILEGES;
