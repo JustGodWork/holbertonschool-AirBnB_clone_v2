@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
 from models.base_model import Base
 from models.user import User
 from models.state import State
@@ -83,5 +83,5 @@ class DBStorage:
         Loads storage dictionary from file
         """
         Base.metadata.create_all(self.__engine)
-        Session = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        self.__session = Session(Session)
+        session = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        self.__session = session()
