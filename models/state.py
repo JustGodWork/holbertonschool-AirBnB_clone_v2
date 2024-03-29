@@ -3,49 +3,21 @@
 from models.base_model import BaseModel
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relation
 from models.city import City
 from os import getenv
 
 
-if getenv('HBNB_TYPE_STORAGE') == 'db':
-    class State(BaseModel, Base):
-        """ State class """
-        __tablename__ = 'states'
-        name = Column(String(128), nullable=False)
-        cities = relationship("City", cascade="all, delete", backref="state")
+class State(BaseModel, Base):
+    """ State class """
+    __tablename__ = "states"
+    name = Column(String(128), nullable=False)
 
-        if getenv("HBNB_TYPE_STORAGE") != "db":
-            @property
-            def cities(self):
-                """
-                    Getter attribute cities that returns the
-                    list of City instances
-                    with state_id equals to the current State.id
-                """
-                from models import storage
-                city_list = []
-                for city in storage.all(City).values():
-                    if city.state_id == self.id:
-                        city_list.append(city)
-                return city_list
-
-else:
-    class State(BaseModel):
-        """ State class """
-        name = ""
-        cities = {}
-
+    if getenv("HBNB_TYPE_STORAGE") == "db":
+        cities = relation("City", cascade="all, delete", backref="state")
+    else:
         @property
         def cities(self):
-            """
-                Getter attribute cities that returns
-                the list of City instances
-                with state_id equals to the current State.id
-            """
             from models import storage
-            city_list = []
-            for city in storage.all(City).values():
-                if city.state_id == self.id:
-                    city_list.append(city)
-            return city_list
+            return [city for city in storage.all(City)
+                    .values() if city.state_id == self.id]
