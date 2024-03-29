@@ -3,13 +3,13 @@ CREATE DATABASE IF NOT EXISTS hbnb_dev_db;
 
 USE hbnb_dev_db;
 
-CREATE TABLE states (
+CREATE TABLE IF NOT EXISTS states (
     id INT AUTO_INCREMENT,
     name VARCHAR(255),
     PRIMARY KEY(id)
 );
 
-CREATE TABLE cities (
+CREATE TABLE IF NOT EXISTS cities (
     id INT AUTO_INCREMENT,
     name VARCHAR(128) NOT NULL,
     state_id VARCHAR(60) NOT NULL,
