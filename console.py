@@ -153,7 +153,6 @@ class HBNBCommand(cmd.Cmd):
                 setattr(new_instance, key, value)
             print(new_instance.id)
             new_instance.save()
-            storage.save()
         except Exception:
             pass
 
