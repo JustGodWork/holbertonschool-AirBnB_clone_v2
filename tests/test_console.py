@@ -80,10 +80,13 @@ class TestHBTNCommand(unittest.TestCase):
 
     def test_do_create_valid_class_with_different_types_of_params(self):
         """
-        Test create command with valid class and different types of params
+            Test create command with valid class
+            and different types of params
         """
         with patch('sys.stdout', new=StringIO()) as f:
-            self.cli.onecmd("create BaseModel name=\"John\" age=30 weight=75.5")
+            self.cli.onecmd(
+                "create BaseModel name=\"John\" age=30 weight=75.5"
+            )
             self.assertNotEqual(f.getvalue(), "** class doesn't exist **\n")
             self.assertNotEqual(f.getvalue(), "** class name missing **\n")
 
@@ -97,24 +100,54 @@ class TestHBTNCommand(unittest.TestCase):
                 self.cli.onecmd("create BaseModel name=\"John\"")
                 mock_storage.new.assert_called()
                 mock_storage.save.assert_called()
-                self.assertNotEqual(f.getvalue(), "** class doesn't exist **\n")
-                self.assertNotEqual(f.getvalue(), "** class name missing **\n")
+                self.assertNotEqual(
+                    f.getvalue(),
+                    "** class doesn't exist **\n"
+                )
+                self.assertNotEqual(
+                    f.getvalue(),
+                    "** class name missing **\n"
+                )
 
-    def test_do_create_dbstorage_many_args(self):
+    def test_create_state_and_city_dbstorage(self):
         """
-        Test create command with dbstorage
+        Test create command with dbstorage for State and City
         """
         with patch('sys.stdout', new=StringIO()) as f:
             with patch('models.storage') as mock_storage:
                 from models.state import State
+                from models.city import City
                 mock_storage.type = 'db'
+                # Create and save State
                 state = State(name="California")
                 state.save()
-                self.cli.onecmd("create City state_id=\"{}\" name=\"San Francisco\"".format(state.id))
-                mock_storage.new.assert_called()
+                mock_storage.new.assert_called_with(state)
                 mock_storage.save.assert_called()
-                self.assertNotEqual(f.getvalue(), "** class doesn't exist **\n")
-                self.assertNotEqual(f.getvalue(), "** class name missing **\n")
+                # Create and save City
+                city = City(state_id=state.id, name="Fremont")
+                city.save()
+                mock_storage.new.assert_called_with(city)
+                mock_storage.save.assert_called()
+
+    def test_create_state_and_city_dbstorage_with_spacer(self):
+        """
+        Test create command with dbstorage for State and City
+        """
+        with patch('sys.stdout', new=StringIO()) as f:
+            with patch('models.storage') as mock_storage:
+                from models.state import State
+                from models.city import City
+                mock_storage.type = 'db'
+                # Create and save State
+                state = State(name="California")
+                state.save()
+                mock_storage.new.assert_called_with(state)
+                mock_storage.save.assert_called()
+                # Create and save City
+                city = City(state_id=state.id, name="San_Francisco")
+                city.save()
+                mock_storage.new.assert_called_with(city)
+                mock_storage.save.assert_called()
 
     def test_do_create_filestorage(self):
         """
@@ -126,8 +159,67 @@ class TestHBTNCommand(unittest.TestCase):
                 self.cli.onecmd("create BaseModel name=\"John\"")
                 mock_storage.new.assert_called()
                 mock_storage.save.assert_called()
-                self.assertNotEqual(f.getvalue(), "** class doesn't exist **\n")
-                self.assertNotEqual(f.getvalue(), "** class name missing **\n")
+                self.assertNotEqual(
+                    f.getvalue(),
+                    "** class doesn't exist **\n"
+                )
+                self.assertNotEqual(
+                    f.getvalue(),
+                    "** class name missing **\n"
+                )
+
+    def test_create_state_city_user_place_dbstorage(self):
+        """
+            Test create command with dbstorage
+            for State, City, User, and Place
+        """
+        from models.state import State
+        from models.city import City
+        from models.user import User
+        from models.place import Place
+
+        with patch('sys.stdout', new=StringIO()) as f:
+            with patch('models.storage') as mock_storage:
+                mock_storage.type = 'db'
+                # Create and save State
+                state = State(name="California")
+                state.save()
+                mock_storage.new.assert_called_with(state)
+                mock_storage.save.assert_called()
+                # Create and save City
+                city = City(
+                    state_id=state.id,
+                    name="San_Francisco_is_super_cool"
+                )
+                city.save()
+                mock_storage.new.assert_called_with(city)
+                mock_storage.save.assert_called()
+                # Create and save User
+                user = User(
+                    email="my@me.com",
+                    password="pwd",
+                    first_name="FN",
+                    last_name="LN"
+                )
+                user.save()
+                mock_storage.new.assert_called_with(user)
+                mock_storage.save.assert_called()
+                # Create and save Place
+                place = Place(
+                    city_id=city.id,
+                    user_id=user.id,
+                    name="My_house",
+                    description="A house",
+                    number_rooms=4,
+                    number_bathrooms=2,
+                    max_guest=10,
+                    price_by_night=100,
+                    latitude=37.7749,
+                    longitude=122.4194
+                )
+                place.save()
+                mock_storage.new.assert_called_with(place)
+                mock_storage.save.assert_called()
 
 
 if __name__ == '__main__':
