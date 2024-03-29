@@ -8,9 +8,10 @@ import unittest
 from console import HBNBCommand
 from unittest.mock import patch
 from io import StringIO
+from tests.test_models.test_base_model import test_basemodel
 
 
-class TestHBTNCommand(unittest.TestCase):
+class TestHBTNCommand(test_basemodel):
     """
     Test cases for the console
     """
@@ -146,7 +147,79 @@ class TestHBTNCommand(unittest.TestCase):
                     f.getvalue(),
                     "** class name missing **\n"
                 )
-                self.cli.onecmd(f"create City state_id=\"{f.getvalue()}\" name=\"Fremont\"")
+                self.cli.onecmd(f"create City \
+                                state_id=\"{f.getvalue()}\" name=\"Fremont\"")
+                mock_storage.new.assert_called()
+                mock_storage.save.assert_called()
+                self.assertNotEqual(
+                    f.getvalue(),
+                    "** class doesn't exist **\n"
+                )
+                self.assertNotEqual(
+                    f.getvalue(),
+                    "** class name missing **\n"
+                )
+
+    def test_create_s_c_u_p_dbstorage(self):
+        """
+            Test create command with dbstorage
+            for State, City, User, and Place
+        """
+        with patch('sys.stdout', new=StringIO()) as f:
+            with patch('models.storage') as mock_storage:
+                mock_storage.type = 'db'
+                # Create and save State
+                self.cli.onecmd("create State name=\"California\"")
+                mock_storage.new.assert_called()
+                mock_storage.save.assert_called()
+                state_id = f.getvalue()
+                self.assertNotEqual(
+                    state_id,
+                    "** class doesn't exist **\n"
+                )
+                self.assertNotEqual(
+                    state_id,
+                    "** class name missing **\n"
+                )
+                # Create and save City
+                self.cli.onecmd(f"create City \
+                                state_id=\"{state_id}\" \
+                                name=\"San_Francisco_is_super_cool\"")
+                mock_storage.new.assert_called()
+                mock_storage.save.assert_called()
+                city_id = f.getvalue()
+                self.assertNotEqual(
+                    city_id,
+                    "** class doesn't exist **\n"
+                )
+                self.assertNotEqual(
+                    city_id,
+                    "** class name missing **\n"
+                )
+                # Create and save User
+                self.cli.onecmd("create User email=\"my@me.com\" \
+                                password=\"pwd\" first_name=\"FN\" \
+                                last_name=\"LN\"")
+                mock_storage.new.assert_called()
+                mock_storage.save.assert_called()
+                user_id = f.getvalue()
+                self.assertNotEqual(
+                    user_id,
+                    "** class doesn't exist **\n"
+                )
+                self.assertNotEqual(
+                    user_id,
+                    "** class name missing **\n"
+                )
+                # Create and save Place
+                self.cli.onecmd(f"create Place city_id=\"{city_id}\" \
+                                user_id=\"{user_id}\" \
+                                name=\"My_house\" description=\"A house\" \
+                                number_rooms=4 \
+                                number_bathrooms=2 max_guest=10 \
+                                price_by_night=100 \
+                                latitude=37.7749 \
+                                longitude=122.4194")
                 mock_storage.new.assert_called()
                 mock_storage.save.assert_called()
                 self.assertNotEqual(
