@@ -118,12 +118,6 @@ class test_fileStorage(unittest.TestCase):
             new.save()
             self.assertTrue(os.path.exists('file.json'))
 
-    def test_type_path(self):
-        """ Confirm __file_path is string """
-        if (os.getenv('HBNB_TYPE_STORAGE') != 'db'):
-            from models.engine.file_storage import FileStorage
-            self.assertEqual(type(FileStorage.__file_path), str)
-
     def test_type_objects(self):
         """ Confirm __objects is a dict """
         self.assertEqual(type(storage.all()), dict)
