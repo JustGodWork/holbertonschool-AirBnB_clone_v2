@@ -53,7 +53,10 @@ class DBStorage:
                 if (issubclass(classes[i], Base)):
                     query = self.__session.query(classes[i]).all()
                     for obj in query:
-                        key = "{}.{}".format(cls.__name__, obj.id)
+                        key = "{}.{}".format(
+                            classes[i].__name__,
+                            obj.id
+                        )
                         objects[key] = obj
         return objects
 

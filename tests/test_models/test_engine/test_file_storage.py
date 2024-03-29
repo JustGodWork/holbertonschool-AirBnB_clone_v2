@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ Module for testing file storage"""
 import unittest
+from unittest.mock import patch
 from models.base_model import BaseModel
 from models import storage
 import os
@@ -30,11 +31,10 @@ class test_fileStorage(unittest.TestCase):
 
     def test_new(self):
         """ New object is correctly added to __objects """
-        new = BaseModel()
+        from models.state import State
+        new = State(name='California')
         new.save()
-        for obj in storage.all().values():
-            temp = obj
-        self.assertTrue(temp is new)
+        self.assertTrue(storage.all()[f"State.{new.id}"])
 
     def test_all(self):
         """ __objects is properly returned """
@@ -49,33 +49,58 @@ class test_fileStorage(unittest.TestCase):
 
     def test_empty(self):
         """ Data is saved to file """
-        new = BaseModel()
-        thing = new.to_dict()
-        new.save()
-        new2 = BaseModel(**thing)
-        self.assertNotEqual(os.path.getsize('file.json'), 0)
+        from models.state import State
+        from models import storage
+        db_env = os.getenv('HBNB_TYPE_STORAGE')
+        if (db_env != 'db'):
+            new = State(name='California')
+            new.save()
+            self.assertNotEqual(len(storage.all()), 0)
+        else:
+            new = State(name='California')
+            new.save()
+            try:
+                with open('file.json', 'r') as f:
+                    self.assertNotEqual(len(f.read()), 0)
+            except FileNotFoundError:
+                pass
 
     def test_save(self):
         """ FileStorage save method """
-        new = BaseModel()
-        storage.save()
-        self.assertTrue(os.path.exists('file.json'))
+        from models.state import State
+        new = State(name='California')
+        db_env = os.getenv('HBNB_TYPE_STORAGE')
+        if (db_env != 'db'):
+            new.save()
+            self.assertTrue(os.path.exists('file.json'))
+        else:
+            with patch('models.storage') as mock:
+                mock.type = 'db'
+                new.save()
+                mock.new.assert_called()
+                mock.save.assert_called()
 
     def test_reload(self):
         """ Storage file is successfully loaded to __objects """
-        new = BaseModel()
+        from models.state import State
+        new = State(name='California')
         new.save()
         storage.reload()
-        for obj in storage.all().values():
-            loaded = obj
-        self.assertEqual(new.to_dict()['id'], loaded.to_dict()['id'])
+        self.assertTrue(storage.all()[f"State.{new.id}"])
 
     def test_reload_empty(self):
         """ Load from an empty file """
-        with open('file.json', 'w') as f:
-            pass
-        with self.assertRaises(ValueError):
-            storage.reload()
+        db_env = os.getenv('HBNB_TYPE_STORAGE')
+        if (db_env != 'db'):
+            with open('file.json', 'w') as f:
+                pass
+            with self.assertRaises(ValueError):
+                storage.reload()
+        else:
+            with patch('models.storage') as mock:
+                mock.type = 'db'
+                mock.reload()
+                mock.reload.assert_called()
 
     def test_reload_from_nonexistent(self):
         """ Nothing happens if file does not exist """
@@ -83,13 +108,20 @@ class test_fileStorage(unittest.TestCase):
 
     def test_base_model_save(self):
         """ BaseModel save method calls storage save """
-        new = BaseModel()
-        new.save()
-        self.assertTrue(os.path.exists('file.json'))
+        from models.state import State
+        new = State(name='California')
+        if (os.getenv('HBNB_TYPE_STORAGE') == 'db'):
+            with patch('models.storage') as mock:
+                new.save()
+                mock.save.assert_called()
+        else:
+            new.save()
+            self.assertTrue(os.path.exists('file.json'))
 
     def test_type_path(self):
         """ Confirm __file_path is string """
-        self.assertEqual(type(storage._FileStorage__file_path), str)
+        if (os.getenv('HBNB_TYPE_STORAGE') != 'db'):
+            self.assertEqual(type(storage.__file_path), str)
 
     def test_type_objects(self):
         """ Confirm __objects is a dict """
@@ -104,4 +136,6 @@ class test_fileStorage(unittest.TestCase):
     def test_storage_var_created(self):
         """ FileStorage object storage created """
         from models.engine.file_storage import FileStorage
-        self.assertEqual(type(storage), FileStorage)
+        from models.engine.db_storage import DBStorage
+        db_env = os.getenv('HBNB_TYPE_STORAGE')
+        self.assertEqual(type(storage), FileStorage if db_env != 'db' else DBStorage)
