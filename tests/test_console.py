@@ -87,6 +87,48 @@ class TestHBTNCommand(unittest.TestCase):
             self.assertNotEqual(f.getvalue(), "** class doesn't exist **\n")
             self.assertNotEqual(f.getvalue(), "** class name missing **\n")
 
+    def test_do_create_dbstorage(self):
+        """
+        Test create command with dbstorage
+        """
+        with patch('sys.stdout', new=StringIO()) as f:
+            with patch('models.storage') as mock_storage:
+                mock_storage.type = 'db'
+                self.cli.onecmd("create BaseModel name=\"John\"")
+                mock_storage.new.assert_called()
+                mock_storage.save.assert_called()
+                self.assertNotEqual(f.getvalue(), "** class doesn't exist **\n")
+                self.assertNotEqual(f.getvalue(), "** class name missing **\n")
+
+    def test_do_create_dbstorage_many_args(self):
+        """
+        Test create command with dbstorage
+        """
+        with patch('sys.stdout', new=StringIO()) as f:
+            with patch('models.storage') as mock_storage:
+                from models.state import State
+                mock_storage.type = 'db'
+                state = State(name="California")
+                state.save()
+                self.cli.onecmd("create City state_id=\"{}\" name=\"San Francisco\"".format(state.id))
+                mock_storage.new.assert_called()
+                mock_storage.save.assert_called()
+                self.assertNotEqual(f.getvalue(), "** class doesn't exist **\n")
+                self.assertNotEqual(f.getvalue(), "** class name missing **\n")
+
+    def test_do_create_filestorage(self):
+        """
+        Test create command with filestorage
+        """
+        with patch('sys.stdout', new=StringIO()) as f:
+            with patch('models.storage') as mock_storage:
+                mock_storage.type = 'file'
+                self.cli.onecmd("create BaseModel name=\"John\"")
+                mock_storage.new.assert_called()
+                mock_storage.save.assert_called()
+                self.assertNotEqual(f.getvalue(), "** class doesn't exist **\n")
+                self.assertNotEqual(f.getvalue(), "** class name missing **\n")
+
 
 if __name__ == '__main__':
     unittest.main()
