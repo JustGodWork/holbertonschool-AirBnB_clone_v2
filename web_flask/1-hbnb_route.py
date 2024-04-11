@@ -8,6 +8,7 @@ app = Flask(__name__)
 def listen():
     return "Hello HBNB!"
 
+
 @app.route("/hbnb", strict_slashes=False)
 def listen_hbnb():
     return "HBNB"

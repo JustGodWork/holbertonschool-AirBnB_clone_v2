@@ -8,14 +8,16 @@ app = Flask(__name__)
 def listen():
     return "Hello HBNB!"
 
+
 @app.route("/hbnb", strict_slashes=False)
 def listen_hbnb():
     return "HBNB"
 
+
 @app.route("/c/<text>", strict_slashes=False)
 def listen_c(text):
-	text = text.replace("_", " ")
-	return "C {}".format(text)
+    text = text.replace("_", " ")
+    return "C {}".format(text)
 
 
 if __name__ == "__main__":
