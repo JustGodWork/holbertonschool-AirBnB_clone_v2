@@ -18,7 +18,7 @@ def listen(id=None):
             cities = sorted(state.cities, key=lambda x: x.name)
             return render_template(
                 '9-states.html',
-                states=states,
+                states=False,
                 state=state,
                 cities=cities
             )
