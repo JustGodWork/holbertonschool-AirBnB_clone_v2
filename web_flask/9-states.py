@@ -13,9 +13,10 @@ def listen(id):
     states = storage.all("State").values()
     for state in states:
         if state.id == id:
-            return render_template('9-states.html', state=state, id=id)
+            cities = sorted(state.cities, key = lambda v: v.name)
+            return render_template('9-states.html', state=state, cities=cities)
     if id is None:
-        return render_template('9-states.html', states=states, id=id)
+        return render_template('9-states.html', states=states)
     return render_template('9-states.html')
 
 
