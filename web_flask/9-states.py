@@ -6,18 +6,25 @@ from flask import Flask, render_template
 app = Flask(__name__)
 
 
-@app.route("/states", defaults={'id': None}, strict_slashes=False)
+@app.route("/states", strict_slashes=False)
 @app.route("/states/<id>", strict_slashes=False)
-def listen(id):
+def listen(id=None):
     from models import storage
     states = storage.all("State").values()
-    for state in states:
-        if state.id == id:
-            cities = sorted(state.cities, key=lambda v: v.name)
-            return render_template('9-states.html', state=state, cities=cities)
-    if id is None:
-        return render_template('9-states.html', states=states)
-    return render_template('9-states.html')
+    states = sorted(states, key=lambda x: x.name)
+    if id:
+        state = next((state for state in states if state.id == id), None)
+        if state:
+            cities = sorted(state.cities, key=lambda x: x.name)
+            return render_template(
+                '9-states.html',
+                states=states,
+                state=state,
+                cities=cities
+            )
+        else:
+            return render_template('9-states.html', states=states, state=None)
+    return render_template('9-states.html', states=states)
 
 
 @app.teardown_appcontext
