@@ -10,13 +10,13 @@ app = Flask(__name__)
 @app.route("/states/<id>", strict_slashes=False)
 def listen(id):
     from models import storage
-    states = storage.all("State")
-    for value in states.values():
-        if id == value.id:
-            return render_template("9-states.html", state=states, id=id)
-    if (id is None):
-        return render_template("9-states.html", states=states, id=id)
-    return render_template("9-states.html")
+    states = storage.all("State").values()
+    for state in states:
+        if state.id == id:
+            return render_template('9-states.html', state=state, id=id)
+    if id is None:
+        return render_template('9-states.html', states=states, id=id)
+    return render_template('9-states.html')
 
 
 @app.teardown_appcontext
