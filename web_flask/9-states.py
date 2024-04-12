@@ -23,7 +23,7 @@ def listen(id=None):
                 cities=cities
             )
         else:
-            return render_template('9-states.html', states=None, state=None)
+            return render_template('9-states.html', states=False, state=None)
     return render_template('9-states.html', states=states)
 
 
