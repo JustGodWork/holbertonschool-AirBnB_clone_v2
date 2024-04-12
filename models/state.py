@@ -19,5 +19,4 @@ class State(BaseModel, Base):
         @property
         def cities(self):
             from models import storage
-            return [city for city in storage.all(City)
-                    .values() if city.state_id == self.id]
+            return [city for city in storage.all(City).values() if city.state_id == self.id]
